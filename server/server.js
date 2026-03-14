@@ -14,12 +14,9 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://mahilamandel.store',
-    'https://www.mahilamandel.store',
-    process.env.CLIENT_URL
-  ].filter(Boolean),
+  origin: function(origin, callback) {
+    callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json());

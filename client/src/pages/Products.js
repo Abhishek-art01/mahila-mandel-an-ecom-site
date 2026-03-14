@@ -31,7 +31,9 @@ export default function Products() {
 
   const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
 
-  useEffect(() => { getCategories().then(r => setCategories(r.data)); }, []);
+  useEffect(() => { 
+    getCategories().then(r => setCategories(Array.isArray(r.data) ? r.data : [])); 
+  }, []);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);

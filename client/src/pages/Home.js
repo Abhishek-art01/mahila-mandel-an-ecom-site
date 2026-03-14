@@ -26,8 +26,10 @@ export default function Home() {
     const load = async () => {
       try {
         const [f, c] = await Promise.all([getFeatured(), getCategories()]);
-        setFeatured(f.data);
-        setCategories(c.data);
+        setFeatured(Array.isArray(f.data) ? f.data : []);
+        setCategories(Array.isArray(c.data) ? c.data : []);
+      } catch (err) {
+        console.error('Failed to load home data:', err);
       } finally { setLoading(false); }
     };
     load();

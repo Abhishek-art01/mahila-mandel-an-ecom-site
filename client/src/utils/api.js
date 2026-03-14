@@ -3,7 +3,6 @@ import axios from 'axios';
 const API = axios.create({ 
   baseURL: 'https://mahila-mande-lserver.onrender.com/api' 
 });
-
 API.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('shopkart_user') || 'null');
   if (user?.token) config.headers.Authorization = `Bearer ${user.token}`;

@@ -12,21 +12,33 @@ const { cartRouter, wishlistRouter } = require('./routes/cartWishlist');
 
 connectDB();
 const app = express();
-// Add this BEFORE app.use(cors(...))
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://mahilamadel.store',
+  'https://www.mahilamadel.store',
+];
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
 
 app.use(cors({
-  origin: function(origin, callback) {
-    callback(null, true);
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
-  credentials: true
+  credentials: true,
 }));
 
 app.use(express.json());

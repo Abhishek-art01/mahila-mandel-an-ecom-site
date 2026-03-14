@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ShopKart API Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+  .header { background: linear-gradient(135deg, #2874f0, #1a56db); padding: 32px 40px; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #fff; }
+  .header h1 span { color: #ffe600; }
+  .header p { color: rgba(255,255,255,0.8); margin-top: 6px; font-size: 14px; }
+  .status-bar { background: #1e293b; padding: 16px 40px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .status-text { font-size: 14px; color: #22c55e; font-weight: 500; }
+  .status-time { margin-left: auto; font-size: 12px; color: #64748b; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 40px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 20px; }
+  .stat-icon { font-size: 28px; margin-bottom: 10px; }
+  .stat-value { font-size: 26px; font-weight: 700; color: #fff; }
+  .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 16px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .endpoints { display: flex; flex-direction: column; gap: 8px; }
+  .endpoint { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; text-decoration: none; transition: border-color 0.2s; }
+  .endpoint:hover { border-color: #2874f0; }
+  .method { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; min-width: 48px; text-align: center; }
+  .get { background: #064e3b; color: #34d399; }
+  .post { background: #1e3a5f; color: #60a5fa; }
+  .put { background: #451a03; color: #fb923c; }
+  .delete { background: #450a0a; color: #f87171; }
+  .endpoint-path { font-family: monospace; font-size: 14px; color: #e2e8f0; }
+  .endpoint-desc { margin-left: auto; font-size: 12px; color: #64748b; }
+  .lock { font-size: 11px; color: #f59e0b; margin-left: 8px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .footer { text-align: center; padding: 24px; color: #475569; font-size: 13px; border-top: 1px solid #1e293b; margin-top: 20px; }
+  @media(max-width:768px){ .grid{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;} .container{padding:20px;} .header{padding:24px 20px;} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Shop<span>Kart</span> API</h1>
+  <p>Backend REST API Server — v1.0.0</p>
+</div>
+
+<div class="status-bar">
+  <div class="status-dot"></div>
+  <span class="status-text">Server Online</span>
+  <span class="status-time" id="time"></span>
+</div>
+
+<div class="container">
+  <div class="grid">
+    <div class="stat-card"><div class="stat-icon">🚀</div><div class="stat-value">Online</div><div class="stat-label">Server Status</div></div>
+    <div class="stat-card"><div class="stat-icon">🗄️</div><div class="stat-value">Atlas</div><div class="stat-label">MongoDB</div></div>
+    <div class="stat-card"><div class="stat-icon">🔒</div><div class="stat-value">JWT</div><div class="stat-label">Auth Method</div></div>
+    <div class="stat-card"><div class="stat-icon">🌐</div><div class="stat-value">v1</div><div class="stat-label">API Version</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="section">
+      <h2>Auth Routes</h2>
+      <div class="endpoints">
+        <a href="/api/health" class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/health</span><span class="endpoint-desc">Health check</span></a>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/auth/register</span><span class="endpoint-desc">Register user</span></div>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/auth/login</span><span class="endpoint-desc">Login user</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/auth/profile</span><span class="lock">🔒</span><span class="endpoint-desc">Get profile</span></div>
+        <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/auth/profile</span><span class="lock">🔒</span><span class="endpoint-desc">Update profile</span></div>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/auth/address</span><span class="lock">🔒</span><span class="endpoint-desc">Add address</span></div>
+        <div class="endpoint"><span class="method delete">DEL</span><span class="endpoint-path">/api/auth/address/:id</span><span class="lock">🔒</span><span class="endpoint-desc">Delete address</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Product Routes</h2>
+      <div class="endpoints">
+        <a href="/api/products" class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/products</span><span class="endpoint-desc">All products</span></a>
+        <a href="/api/products/featured" class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/products/featured</span><span class="endpoint-desc">Featured</span></a>
+        <a href="/api/products/categories" class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/products/categories</span><span class="endpoint-desc">Categories</span></a>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/products/:id</span><span class="endpoint-desc">Single product</span></div>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/products/:id/reviews</span><span class="lock">🔒</span><span class="endpoint-desc">Add review</span></div>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/products</span><span class="lock">🔒 Admin</span><span class="endpoint-desc">Create</span></div>
+        <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/products/:id</span><span class="lock">🔒 Admin</span><span class="endpoint-desc">Update</span></div>
+        <div class="endpoint"><span class="method delete">DEL</span><span class="endpoint-path">/api/products/:id</span><span class="lock">🔒 Admin</span><span class="endpoint-desc">Delete</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Order Routes</h2>
+      <div class="endpoints">
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/orders</span><span class="lock">🔒</span><span class="endpoint-desc">Create order</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/orders/myorders</span><span class="lock">🔒</span><span class="endpoint-desc">My orders</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/orders/:id</span><span class="lock">🔒</span><span class="endpoint-desc">Order detail</span></div>
+        <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/orders/:id/pay</span><span class="lock">🔒</span><span class="endpoint-desc">Pay order</span></div>
+        <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/orders/:id/cancel</span><span class="lock">🔒</span><span class="endpoint-desc">Cancel order</span></div>
+        <a href="/api/orders/admin/stats" class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/orders/admin/stats</span><span class="lock">🔒 Admin</span></a>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/orders/admin/all</span><span class="lock">🔒 Admin</span><span class="endpoint-desc">All orders</span></div>
+        <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/orders/:id/status</span><span class="lock">🔒 Admin</span><span class="endpoint-desc">Update status</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Cart & Wishlist</h2>
+      <div class="endpoints">
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/cart</span><span class="lock">🔒</span><span class="endpoint-desc">Get cart</span></div>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/cart</span><span class="lock">🔒</span><span class="endpoint-desc">Add to cart</span></div>
+        <div class="endpoint"><span class="method put">PUT</span><span class="endpoint-path">/api/cart/:id</span><span class="lock">🔒</span><span class="endpoint-desc">Update qty</span></div>
+        <div class="endpoint"><span class="method delete">DEL</span><span class="endpoint-path">/api/cart/:id</span><span class="lock">🔒</span><span class="endpoint-desc">Remove item</span></div>
+        <div class="endpoint"><span class="method delete">DEL</span><span class="endpoint-path">/api/cart</span><span class="lock">🔒</span><span class="endpoint-desc">Clear cart</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/wishlist</span><span class="lock">🔒</span><span class="endpoint-desc">Get wishlist</span></div>
+        <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/api/wishlist/:id</span><span class="lock">🔒</span><span class="endpoint-desc">Toggle item</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ShopKart API © 2024 | Built with Node.js + Express + MongoDB Atlas
+</div>
+
+<script>
+  document.getElementById('time').textContent = 'Started at ' + new Date().toLocaleString();
+</script>
+
+</body>
+</html>

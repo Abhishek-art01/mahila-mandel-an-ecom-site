@@ -37,19 +37,13 @@ export default function Admin() {
 
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Delete this product?')) return;
-    try {
-      await deleteProduct(id);
-      setProducts(prev => prev.filter(p => p._id !== id));
-      toast.success('Product deleted');
-    } catch { toast.error('Failed to delete'); }
+    try { await deleteProduct(id); setProducts(prev => prev.filter(p => p._id !== id)); toast.success('Deleted'); }
+    catch { toast.error('Failed'); }
   };
 
   const handleToggleAdmin = async (userId, isAdmin) => {
-    try {
-      await updateUser(userId, { isAdmin: !isAdmin });
-      setUsers(prev => prev.map(u => u._id === userId ? { ...u, isAdmin: !isAdmin } : u));
-      toast.success('User updated');
-    } catch { toast.error('Failed to update'); }
+    try { await updateUser(userId, { isAdmin: !isAdmin }); setUsers(prev => prev.map(u => u._id === userId ? { ...u, isAdmin: !isAdmin } : u)); toast.success('Updated'); }
+    catch { toast.error('Failed'); }
   };
 
   const TABS = [
@@ -62,7 +56,7 @@ export default function Admin() {
   return (
     <div className="admin-page">
       <div className="admin-sidebar">
-        <div className="admin-brand">ShopKart Admin</div>
+        <div className="admin-brand">Mahila <span>✦</span> Madel</div>
         {TABS.map(t => (
           <button key={t.key} className={`admin-nav-item ${tab === t.key ? 'active' : ''}`} onClick={() => setTab(t.key)}>
             {t.label}
@@ -74,42 +68,34 @@ export default function Admin() {
       <div className="admin-main">
         {loading && <div className="spinner-wrap"><div className="spinner" /></div>}
 
-        {/* Dashboard */}
         {tab === 'dashboard' && stats && !loading && (
           <div>
             <h1 className="admin-title">Dashboard</h1>
             <div className="stat-cards">
               {[
-                { label: 'Total Revenue', value: fmt(stats.totalRevenue), icon: '💰', color: '#e3f2fd' },
-                { label: 'Total Orders', value: stats.totalOrders, icon: '📦', color: '#e8f5e9' },
-                { label: 'Products', value: stats.totalProducts, icon: '🛍️', color: '#fff3e0' },
-                { label: 'Customers', value: stats.totalUsers, icon: '👥', color: '#fce4ec' },
+                { label: 'Total Revenue', value: fmt(stats.totalRevenue), icon: '💰' },
+                { label: 'Total Orders', value: stats.totalOrders, icon: '📦' },
+                { label: 'Products', value: stats.totalProducts, icon: '🛍️' },
+                { label: 'Customers', value: stats.totalUsers, icon: '👥' },
               ].map(s => (
-                <div key={s.label} className="stat-card" style={{ background: s.color }}>
+                <div key={s.label} className="stat-card">
                   <div className="stat-icon">{s.icon}</div>
                   <div><p className="stat-value">{s.value}</p><p className="stat-label">{s.label}</p></div>
                 </div>
               ))}
             </div>
-
             <div className="admin-grid-2">
               <div className="admin-card">
                 <h3>Orders by Status</h3>
                 {stats.ordersByStatus.map(s => (
-                  <div key={s._id} className="status-row">
-                    <span>{s._id}</span>
-                    <span className="status-count">{s.count}</span>
-                  </div>
+                  <div key={s._id} className="status-row"><span>{s._id}</span><span className="status-count">{s.count}</span></div>
                 ))}
               </div>
               <div className="admin-card">
                 <h3>Recent Orders</h3>
                 {stats.recentOrders.map(o => (
                   <div key={o._id} className="recent-order">
-                    <div>
-                      <p className="fs-13 fw-500">#{o._id.slice(-6).toUpperCase()}</p>
-                      <p className="fs-12 text-muted">{o.user?.name}</p>
-                    </div>
+                    <div><p className="fs-13 fw-500">#{o._id.slice(-6).toUpperCase()}</p><p className="fs-12 text-muted">{o.user?.name}</p></div>
                     <div style={{ textAlign: 'right' }}>
                       <p className="fs-13 fw-500">{fmt(o.totalPrice)}</p>
                       <span className={`badge badge-${o.status === 'Delivered' ? 'success' : o.status === 'Cancelled' ? 'danger' : 'primary'}`}>{o.status}</span>
@@ -121,15 +107,12 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Orders */}
         {tab === 'orders' && !loading && (
           <div>
             <h1 className="admin-title">All Orders ({orders.length})</h1>
             <div className="admin-table-wrap">
               <table className="admin-table">
-                <thead>
-                  <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th></tr>
-                </thead>
+                <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th></tr></thead>
                 <tbody>
                   {orders.map(o => (
                     <tr key={o._id}>
@@ -138,15 +121,7 @@ export default function Admin() {
                       <td>{o.orderItems.length} item(s)</td>
                       <td className="fw-500">{fmt(o.totalPrice)}</td>
                       <td>{o.paymentMethod}<br/><span className={`badge badge-${o.isPaid ? 'success' : 'warning'}`}>{o.isPaid ? 'Paid' : 'Pending'}</span></td>
-                      <td>
-                        <select
-                          value={o.status}
-                          onChange={e => handleStatusChange(o._id, e.target.value)}
-                          className="status-select"
-                        >
-                          {STATUS_OPTS.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      </td>
+                      <td><select value={o.status} onChange={e => handleStatusChange(o._id, e.target.value)} className="status-select">{STATUS_OPTS.map(s => <option key={s} value={s}>{s}</option>)}</select></td>
                       <td className="fs-12 text-muted">{new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
                     </tr>
                   ))}
@@ -156,7 +131,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Products */}
         {tab === 'products' && !loading && (
           <div>
             <div className="admin-tab-head">
@@ -165,32 +139,18 @@ export default function Admin() {
             </div>
             <div className="admin-table-wrap">
               <table className="admin-table">
-                <thead>
-                  <tr><th>Product</th><th>Category</th><th>Price</th><th>MRP</th><th>Stock</th><th>Sales</th><th>Rating</th><th>Actions</th></tr>
-                </thead>
+                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>MRP</th><th>Stock</th><th>Sales</th><th>Rating</th><th>Actions</th></tr></thead>
                 <tbody>
                   {products.map(p => (
                     <tr key={p._id}>
-                      <td>
-                        <div className="prod-cell">
-                          <img src={p.images?.[0] || 'https://via.placeholder.com/40'} alt="" />
-                          <span className="prod-cell-name">{p.name}</span>
-                        </div>
-                      </td>
+                      <td><div className="prod-cell"><img src={p.images?.[0] || 'https://via.placeholder.com/40'} alt="" /><span className="prod-cell-name">{p.name}</span></div></td>
                       <td>{p.category}</td>
                       <td className="fw-500">{fmt(p.price)}</td>
                       <td className="text-muted">{fmt(p.mrp)}</td>
-                      <td>
-                        <span className={p.stock === 0 ? 'text-danger' : p.stock <= 5 ? 'text-warning' : 'text-success'}>{p.stock === 0 ? 'OOS' : p.stock}</span>
-                      </td>
+                      <td><span className={p.stock === 0 ? 'text-danger' : p.stock <= 5 ? '' : 'text-success'} style={p.stock <= 5 && p.stock > 0 ? {color:'#B8860B'} : {}}>{p.stock === 0 ? 'OOS' : p.stock}</span></td>
                       <td>{p.sold}</td>
                       <td>{p.ratings?.toFixed(1)} ★</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <Link to={`/admin/product/${p._id}`} className="btn btn-outline btn-sm">Edit</Link>
-                          <button className="btn btn-danger btn-sm" onClick={() => handleDeleteProduct(p._id)}>Del</button>
-                        </div>
-                      </td>
+                      <td><div style={{ display: 'flex', gap: 6 }}><Link to={`/admin/product/${p._id}`} className="btn btn-outline btn-sm">Edit</Link><button className="btn btn-danger btn-sm" onClick={() => handleDeleteProduct(p._id)}>Del</button></div></td>
                     </tr>
                   ))}
                 </tbody>
@@ -199,15 +159,12 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Users */}
         {tab === 'users' && !loading && (
           <div>
             <h1 className="admin-title">Users ({users.length})</h1>
             <div className="admin-table-wrap">
               <table className="admin-table">
-                <thead>
-                  <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
-                </thead>
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
                 <tbody>
                   {users.map(u => (
                     <tr key={u._id}>
@@ -216,11 +173,7 @@ export default function Admin() {
                       <td>{u.phone || '—'}</td>
                       <td><span className={`badge badge-${u.isAdmin ? 'danger' : 'muted'}`}>{u.isAdmin ? 'Admin' : 'User'}</span></td>
                       <td className="fs-12 text-muted">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                      <td>
-                        <button className="btn btn-outline btn-sm" onClick={() => handleToggleAdmin(u._id, u.isAdmin)}>
-                          {u.isAdmin ? 'Revoke Admin' : 'Make Admin'}
-                        </button>
-                      </td>
+                      <td><button className="btn btn-outline btn-sm" onClick={() => handleToggleAdmin(u._id, u.isAdmin)}>{u.isAdmin ? 'Revoke Admin' : 'Make Admin'}</button></td>
                     </tr>
                   ))}
                 </tbody>

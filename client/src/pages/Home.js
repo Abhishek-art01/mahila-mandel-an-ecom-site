@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getFeatured, getCategories } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import './Home.css';
 
-const BANNERS = [
-  { title: 'New Collection', sub: 'Festive Jewellery Sale', tag: 'Up to 80% Off', cat: 'Jewellery', bg: '#e3f2fd', accent: '#1565c0', emoji: '💎' },
-  { title: 'Ethnic Wear', sub: 'Sarees & Suits', tag: 'Starting ₹499', cat: 'Clothing', bg: '#fce4ec', accent: '#880e4f', emoji: '👗' },
-  { title: 'Designer Bags', sub: 'Premium Collection', tag: 'Min 40% Off', cat: 'Bags', bg: '#e8f5e9', accent: '#1b5e20', emoji: '👜' },
-];
-
-const CAT_ICONS = {
-  'Jewellery': '💎', 'Clothing': '👗', 'Bags': '👜',
-  'Footwear': '👠', 'Accessories': '🧣', 'Beauty': '💄',
-  'Home Decor': '🏠', 'Electronics': '📱',
+const CAT_DATA = {
+  Jewellery: { emoji: '💎', tagline: 'Gold & Kundan' },
+  Clothing: { emoji: '👗', tagline: 'Sarees & Suits' },
+  Bags: { emoji: '👜', tagline: 'Designer Picks' },
+  Footwear: { emoji: '👠', tagline: 'Heels & Flats' },
+  Accessories: { emoji: '🧣', tagline: 'Scarves & More' },
+  Beauty: { emoji: '💄', tagline: 'Glow Up' },
 };
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [banner, setBanner] = useState(0);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
@@ -28,102 +25,130 @@ export default function Home() {
         const [f, c] = await Promise.all([getFeatured(), getCategories()]);
         setFeatured(Array.isArray(f.data) ? f.data : []);
         setCategories(Array.isArray(c.data) ? c.data : []);
-      } catch (err) {
-        console.error('Failed to load home data:', err);
-      } finally { setLoading(false); }
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
     };
     load();
-    const t = setInterval(() => setBanner(p => (p + 1) % BANNERS.length), 4000);
-    return () => clearInterval(t);
   }, []);
-
-  const b = BANNERS[banner];
 
   return (
     <div className="home">
-      {/* Hero Banner */}
-      <div className="hero" style={{ background: b.bg }}>
-        <div className="hero-content">
-          <span className="hero-tag" style={{ color: b.accent }}>{b.tag}</span>
-          <h1 className="hero-title" style={{ color: b.accent }}>{b.title}</h1>
-          <p className="hero-sub">{b.sub}</p>
-          <Link to={`/products?category=${b.cat}`} className="btn btn-primary hero-cta">Shop Now</Link>
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-bg" />
+        <div className="container hero-content">
+          <div className="hero-left">
+            <div className="hero-eyebrow">New Collection 2025 ✦</div>
+            <h1 className="hero-title">
+              Every Woman<br/>
+              <em>Deserves to</em><br/>
+              <span>Shine</span>
+            </h1>
+            <p className="hero-desc">Handpicked jewellery, ethnic wear &amp; accessories crafted for the modern Indian woman.</p>
+            <div className="hero-actions">
+              <button className="btn btn-primary btn-lg" onClick={() => navigate('/products')}>Shop Collection</button>
+              <button className="btn btn-outline-dark btn-lg" onClick={() => navigate('/products?category=Jewellery')}>View Jewellery</button>
+            </div>
+            <div className="hero-stats">
+              <div className="hero-stat"><span>500+</span><p>Products</p></div>
+              <div className="hero-stat-div" />
+              <div className="hero-stat"><span>10K+</span><p>Happy Customers</p></div>
+              <div className="hero-stat-div" />
+              <div className="hero-stat"><span>4.8★</span><p>Avg Rating</p></div>
+            </div>
+          </div>
+          <div className="hero-right">
+            <div className="hero-card hc-1"><div className="hc-emoji">💍</div><p>Bridal Collection</p></div>
+            <div className="hero-card hc-2"><div className="hc-emoji">👗</div><p>Ethnic Wear</p></div>
+            <div className="hero-card hc-3"><div className="hc-emoji">✨</div><p>New Arrivals</p></div>
+            <div className="hero-orb ho-1" />
+            <div className="hero-orb ho-2" />
+          </div>
         </div>
-        <div className="hero-emoji">{b.emoji}</div>
-        <div className="hero-dots">
-          {BANNERS.map((_, i) => (
-            <button key={i} className={`hero-dot ${i === banner ? 'active' : ''}`} onClick={() => setBanner(i)} />
+      </section>
+
+      {/* TRUST BAR */}
+      <div className="trust-bar">
+        <div className="container trust-inner">
+          {[
+            { icon: '🚚', t: 'Free Delivery', s: 'Orders above ₹499' },
+            { icon: '↩️', t: 'Easy Returns', s: '10-day policy' },
+            { icon: '🔒', t: 'Secure Payment', s: 'SSL encrypted' },
+            { icon: '✅', t: '100% Authentic', s: 'Verified products' },
+            { icon: '💬', t: '24/7 Support', s: 'Always here' },
+          ].map(i => (
+            <div key={i.t} className="trust-item">
+              <span className="trust-icon">{i.icon}</span>
+              <div><p className="trust-t">{i.t}</p><p className="trust-s">{i.s}</p></div>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Categories */}
       <div className="container">
-        <section className="section">
-          <h2 className="section-title">Shop by Category</h2>
+        {/* CATEGORIES */}
+        <section className="home-section">
+          <div className="section-head">
+            <div><p className="section-eyebrow">Browse By</p><h2 className="section-title">Shop Categories</h2></div>
+            <Link to="/products" className="section-link">View All →</Link>
+          </div>
           <div className="cats-grid">
-            {categories.map(cat => (
-              <Link key={cat} to={`/products?category=${cat}`} className="cat-card">
-                <div className="cat-icon">{CAT_ICONS[cat] || '🛍️'}</div>
-                <span>{cat}</span>
-              </Link>
-            ))}
+            {categories.map(cat => {
+              const info = CAT_DATA[cat] || { emoji: '🛍️', tagline: 'Explore' };
+              return (
+                <Link key={cat} to={`/products?category=${cat}`} className="cat-card">
+                  <div className="cat-inner">
+                    <div className="cat-emoji">{info.emoji}</div>
+                    <div className="cat-name">{cat}</div>
+                    <div className="cat-tag">{info.tagline}</div>
+                    <div className="cat-arrow">→</div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
-        {/* Deals banner strip */}
-        <div className="deals-strip">
-          {[
-            { icon: '🚚', title: 'Free Delivery', sub: 'On orders above ₹499' },
-            { icon: '↩️', title: 'Easy Returns', sub: '10-day hassle-free return' },
-            { icon: '🔒', title: 'Secure Payment', sub: 'SSL encrypted checkout' },
-            { icon: '✅', title: '100% Authentic', sub: 'All products verified' },
-          ].map(d => (
-            <div key={d.title} className="deal-item">
-              <span className="deal-icon">{d.icon}</span>
-              <div><p className="deal-title">{d.title}</p><p className="deal-sub">{d.sub}</p></div>
-            </div>
-          ))}
-        </div>
-
-        {/* Featured */}
-        <section className="section">
+        {/* FEATURED */}
+        <section className="home-section">
           <div className="section-head">
-            <h2 className="section-title">Featured Products</h2>
-            <Link to="/products" className="see-all">See All →</Link>
+            <div><p className="section-eyebrow">Handpicked</p><h2 className="section-title">Featured Products</h2></div>
+            <Link to="/products" className="section-link">See All →</Link>
           </div>
-          {loading ? (
-            <div className="spinner-wrap"><div className="spinner" /></div>
-          ) : (
-            <div className="products-grid">
-              {featured.map(p => <ProductCard key={p._id} product={p} />)}
-            </div>
+          {loading ? <div className="spinner-wrap"><div className="spinner" /></div> : (
+            <div className="feat-grid">{featured.map(p => <ProductCard key={p._id} product={p} />)}</div>
           )}
         </section>
 
-        {/* Promo Banners */}
-        <div className="promo-grid">
-          <Link to="/products?category=Jewellery" className="promo-card promo-1">
-            <div><h3>Bridal Jewellery</h3><p>Starting ₹299</p></div>
-            <span>💍</span>
-          </Link>
-          <Link to="/products?category=Clothing" className="promo-card promo-2">
-            <div><h3>Ethnic Wear</h3><p>Up to 70% off</p></div>
-            <span>👘</span>
-          </Link>
-          <Link to="/products?category=Bags" className="promo-card promo-3">
-            <div><h3>Trendy Bags</h3><p>Min 40% off</p></div>
-            <span>👛</span>
-          </Link>
-        </div>
+        {/* PROMO */}
+        <section className="promo-banner">
+          <div className="promo-left">
+            <p className="promo-eye">Limited Time</p>
+            <h2 className="promo-title">Festive Season<br/><em>Grand Sale</em></h2>
+            <p className="promo-sub">Up to 70% off on select jewellery, sarees &amp; more</p>
+            <Link to="/products" className="btn btn-primary">Shop the Sale</Link>
+          </div>
+          <div className="promo-right">
+            <div className="promo-num"><span className="pn-pct">70</span><span className="pn-off">%<br/>OFF</span></div>
+          </div>
+        </section>
+
+        {/* MINI PROMOS */}
+        <section className="home-section">
+          <div className="mini-promos">
+            <Link to="/products?category=Jewellery" className="mini-promo mp-1"><div><h3>Bridal Jewellery</h3><p>Starting ₹299</p><span>Shop Now →</span></div><div className="mp-emoji">💍</div></Link>
+            <Link to="/products?category=Clothing" className="mini-promo mp-2"><div><h3>Ethnic Wear</h3><p>Up to 70% off</p><span>Shop Now →</span></div><div className="mp-emoji">👘</div></Link>
+            <Link to="/products?category=Bags" className="mini-promo mp-3"><div><h3>Designer Bags</h3><p>Min 40% off</p><span>Shop Now →</span></div><div className="mp-emoji">👛</div></Link>
+          </div>
+        </section>
       </div>
 
-      {/* Footer */}
+      {/* FOOTER */}
       <footer className="footer">
-        <div className="container footer-inner">
+        <div className="footer-top container">
           <div className="footer-brand">
-            <h3>ShopKart</h3>
-            <p>Your one-stop destination for women's fashion & accessories.</p>
+            <div className="footer-logo">Mahila <em>✦</em> <span>Madel</span></div>
+            <p>Your one-stop destination for women's fashion, jewellery and accessories.</p>
           </div>
           <div className="footer-col">
             <h4>Quick Links</h4>
@@ -145,7 +170,12 @@ export default function Home() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2024 ShopKart. All rights reserved. | Made with ❤️ in India</p>
+          <div className="container footer-bottom-inner">
+            <p>© 2024 Mahila Madel. All rights reserved. Made with ❤️ in India</p>
+            <div className="footer-pays">
+              {['💳 UPI', '🏦 Net Banking', '💵 COD'].map(p => <span key={p} className="pay-tag">{p}</span>)}
+            </div>
+          </div>
         </div>
       </footer>
     </div>

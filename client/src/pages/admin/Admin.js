@@ -87,7 +87,7 @@ export default function Admin() {
             <div className="admin-grid-2">
               <div className="admin-card">
                 <h3>Orders by Status</h3>
-                {stats.ordersByStatus.map(s => (
+                {(stats.ordersByStatus || []).map(s => (
                   <div key={s._id} className="status-row"><span>{s._id}</span><span className="status-count">{s.count}</span></div>
                 ))}
               </div>

@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 
 const CartContext = createContext();
 
+const safeArray = (data) => Array.isArray(data) ? data : [];
+
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
@@ -18,8 +20,8 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     try {
       const { data } = await getCart();
-      setCart(data);
-    } catch {}
+      setCart(safeArray(data));
+    } catch { setCart([]); }
   };
 
   const addItem = async (productId, qty = 1, size = '', color = '') => {
@@ -27,7 +29,7 @@ export const CartProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await apiAdd({ productId, qty, size, color });
-      setCart(data);
+      setCart(safeArray(data));
       toast.success('Added to cart!');
     } catch (e) {
       toast.error(e.response?.data?.message || 'Failed to add to cart');
@@ -37,28 +39,25 @@ export const CartProvider = ({ children }) => {
   const updateItem = async (itemId, qty) => {
     try {
       const { data } = await updateCartItem(itemId, { qty });
-      setCart(data);
+      setCart(safeArray(data));
     } catch {}
   };
 
   const removeItem = async (itemId) => {
     try {
       const { data } = await apiRemove(itemId);
-      setCart(data);
+      setCart(safeArray(data));
       toast.info('Removed from cart');
     } catch {}
   };
 
   const clearCartItems = async () => {
-    try {
-      await apiClear();
-      setCart([]);
-    } catch {}
+    try { await apiClear(); setCart([]); } catch {}
   };
 
-  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
-  const cartTotal = cart.reduce((s, i) => s + (i.product?.price || 0) * i.qty, 0);
-  const cartMrp = cart.reduce((s, i) => s + (i.product?.mrp || 0) * i.qty, 0);
+  const cartCount = cart.reduce((s, i) => s + (i.qty || 0), 0);
+  const cartTotal = cart.reduce((s, i) => s + (i.product?.price || 0) * (i.qty || 0), 0);
+  const cartMrp = cart.reduce((s, i) => s + (i.product?.mrp || 0) * (i.qty || 0), 0);
   const discount = cartMrp - cartTotal;
 
   return (

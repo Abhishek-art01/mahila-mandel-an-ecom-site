@@ -28,7 +28,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setLoading(true);
-    getProduct(id).then(r => { setProduct(r.data); setLoading(false); }).catch(() => navigate('/404'));
+    getProduct(id).then(r => { setProduct(r.data); setLoading(false); }).catch(() => navigate('/'));
   }, [id, navigate]);
 
   if (loading) return <div className="spinner-wrap"><div className="spinner" /></div>;

@@ -4,7 +4,10 @@ import { loginUser, registerUser, getProfile } from '../utils/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('shopkart_user') || 'null'));
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('shopkart_user') || 'null'); }
+    catch { return null; }
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -20,8 +23,8 @@ export const AuthProvider = ({ children }) => {
       saveUser(data);
       return data;
     } catch (e) {
-      setError(e.response?.data?.message || 'Login failed');
-      throw e;
+      const msg = e.response?.data?.message || 'Login failed';
+      setError(msg); throw e;
     } finally { setLoading(false); }
   };
 
@@ -32,8 +35,8 @@ export const AuthProvider = ({ children }) => {
       saveUser(data);
       return data;
     } catch (e) {
-      setError(e.response?.data?.message || 'Registration failed');
-      throw e;
+      const msg = e.response?.data?.message || 'Registration failed';
+      setError(msg); throw e;
     } finally { setLoading(false); }
   };
 

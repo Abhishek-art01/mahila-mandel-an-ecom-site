@@ -4,8 +4,7 @@ import { useAuth } from './AuthContext';
 import { toast } from 'react-toastify';
 
 const CartContext = createContext();
-
-const safeArray = (data) => Array.isArray(data) ? data : [];
+const safeArr = (d) => Array.isArray(d) ? d : [];
 
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
@@ -20,33 +19,33 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     try {
       const { data } = await getCart();
-      setCart(safeArray(data));
+      setCart(safeArr(data));
     } catch { setCart([]); }
   };
 
   const addItem = async (productId, qty = 1, size = '', color = '') => {
-    if (!user) { toast.info('Please login to add items to cart'); return; }
+    if (!user) { toast.info('Please login to add items'); return; }
     setLoading(true);
     try {
       const { data } = await apiAdd({ productId, qty, size, color });
-      setCart(safeArray(data));
+      setCart(safeArr(data));
       toast.success('Added to cart!');
     } catch (e) {
-      toast.error(e.response?.data?.message || 'Failed to add to cart');
+      toast.error(e.response?.data?.message || 'Failed to add');
     } finally { setLoading(false); }
   };
 
   const updateItem = async (itemId, qty) => {
     try {
       const { data } = await updateCartItem(itemId, { qty });
-      setCart(safeArray(data));
+      setCart(safeArr(data));
     } catch {}
   };
 
   const removeItem = async (itemId) => {
     try {
       const { data } = await apiRemove(itemId);
-      setCart(safeArray(data));
+      setCart(safeArr(data));
       toast.info('Removed from cart');
     } catch {}
   };

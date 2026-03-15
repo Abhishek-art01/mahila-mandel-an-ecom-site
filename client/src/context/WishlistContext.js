@@ -17,20 +17,21 @@ export const WishlistProvider = ({ children }) => {
   const fetchWishlist = async () => {
     try {
       const { data } = await getWishlist();
-      setWishlist(data);
-    } catch {}
+      setWishlist(Array.isArray(data) ? data : []);
+    } catch { setWishlist([]); }
   };
 
   const toggle = async (productId) => {
     if (!user) { toast.info('Please login to save items'); return; }
     try {
       const { data } = await apiToggle(productId);
-      setWishlist(data.wishlist);
+      setWishlist(Array.isArray(data.wishlist) ? data.wishlist : []);
       toast.success(data.added ? 'Added to wishlist!' : 'Removed from wishlist');
     } catch {}
   };
 
-  const isInWishlist = (productId) => wishlist.some(p => p._id === productId || p === productId);
+  const isInWishlist = (productId) =>
+    wishlist.some(p => (p._id || p) === productId);
 
   return (
     <WishlistContext.Provider value={{ wishlist, toggle, isInWishlist }}>
